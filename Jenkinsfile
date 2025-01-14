@@ -27,8 +27,9 @@ pipeline {
                         sh '''
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
-                        git status
+                        pwd
                         git checkout main
+                        git status
                         ls -la
                         git add -A
                         git commit -m "${COMMIT_MESSAGE}"
