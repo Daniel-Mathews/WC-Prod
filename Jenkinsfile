@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        GIT_CREDENTIALS_ID = 'WCProdGithubAccess' // Replace with your Jenkins Git credentials ID
-        GIT_REPO_URL = 'https://github.com/Daniel-Mathews/WC-Prod.git' // Use HTTPS URL
+        GIT_CREDENTIALS_ID = 'WCProdGithubAccess'
+        GIT_REPO_URL = 'https://github.com/Daniel-Mathews/WC-Prod.git'
         GIT_BRANCH = 'main'
     }
     stages {
@@ -23,8 +23,10 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        // Configure git user name and email
                         sh '''
-                        git config --global credential.helper store
+                        git config --global user.name "Jenkins CI"
+                        git config --global user.email "jenkins@example.com"
                         git add .
                         git commit -m "${COMMIT_MESSAGE}"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Daniel-Mathews/WC-Prod.git
