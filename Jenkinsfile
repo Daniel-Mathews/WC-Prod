@@ -27,9 +27,10 @@ pipeline {
                         sh '''
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
+                        git status
                         git checkout main
                         ls -la
-                        git add *
+                        git add -A
                         git commit -m "${COMMIT_MESSAGE}"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Daniel-Mathews/WC-Prod.git
                         '''
