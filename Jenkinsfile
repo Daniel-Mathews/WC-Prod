@@ -39,7 +39,7 @@ pipeline {
                         ls -la
                         git add -A
                         git commit -m "${COMMIT_MESSAGE}"
-                        git git push origin main
+                        git push origin main
                         '''
                     }
                 }
