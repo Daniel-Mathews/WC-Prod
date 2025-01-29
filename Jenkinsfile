@@ -32,13 +32,14 @@ pipeline {
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
                         git config --global --add safe.directory /home/daniel/WC-Prod
+                        git remote set-url origin ${GIT_REPO_URL}
                         pwd
                         git checkout main
                         git status
                         ls -la
                         git add -A
                         git commit -m "${COMMIT_MESSAGE}"
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/Daniel-Mathews/WC-Prod.git ${GIT_BRANCH}
+                        git push 
                         '''
                     }
                 }
