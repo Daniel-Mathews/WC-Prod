@@ -3,8 +3,11 @@ pipeline {
     environment {
         GIT_CREDENTIALS_ID = 'WCProdGithubAccess'
         GIT_REPO_URL = 'https://github.com/Daniel-Mathews/WC-Prod.git'
+        LOCAL_REPO_PATH = '/home/daniel/WC-Prod'
         GIT_BRANCH = 'main'
     }
+
+
     stages {
         stage('Get Custom Commit Message') {
             steps {
@@ -25,6 +28,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: GIT_CREDENTIALS_ID, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         // Configure git user name and email
                         sh '''
+                        cd ${LOCAL_REPO_PATH}
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
                         pwd
