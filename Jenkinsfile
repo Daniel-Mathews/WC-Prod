@@ -31,6 +31,7 @@ pipeline {
                         cd ${LOCAL_REPO_PATH}
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
+                        git config --global --add safe.directory /home/daniel/WC-Prod
                         pwd
                         git checkout main
                         git status
