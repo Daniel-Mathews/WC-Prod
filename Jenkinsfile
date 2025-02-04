@@ -32,8 +32,7 @@ pipeline {
                         git config --global user.name "Jenkins CI"
                         git config --global user.email "jenkins@example.com"
                         git config --global --add safe.directory /home/daniel/WC-Prod
-                        bash -c ". /home/daniel/WC-Prod/.env"
-
+                        bash -c "set -a && . /home/daniel/WC-Prod/.env && set +a"
                         git remote set-url origin https://${GIT_USERNAME}:${GITHUB_PASSWORD}@github.com/Daniel-Mathews/WC-Prod.git
                         pwd
                         git checkout main
