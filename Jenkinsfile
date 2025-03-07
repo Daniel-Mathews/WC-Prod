@@ -5,7 +5,7 @@
 pipeline {
     agent any
     environment {
-        GIT_CREDENTIALS_ID = 'WCProdGithubAccess'
+        GIT_CREDENTIALS_ID = ''
         GIT_REPO_URL = 'https://github.com/Daniel-Mathews/WC-Prod.git'
         LOCAL_REPO_PATH = '/home/daniel/WC-Prod'
         GIT_BRANCH = 'main'
