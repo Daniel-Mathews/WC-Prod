@@ -1,0 +1,15 @@
+{
+    "name": "jdbc-sink",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+      "connection.url": "jdbc:postgresql://maindb:5432/mainDB",
+      "connection.user": "postgres",
+      "connection.password": "daniel",
+      "topics": "source.public.Users",
+      "auto.create": "true",
+      "insert.mode": "upsert",
+      "pk.mode": "record_key",
+      "pk.fields": "id"
+    }
+  }
+  
