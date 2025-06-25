@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_JUTE_MAXBUFFER: 4194304
+      ZOOKEEPER_4LW_COMMANDS_WHITELIST: "stat, ruok, conf, isro"
+    networks:
+      - app_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app_network
+
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:latest
+    container_name: kafka-connect
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "kafka-connect-group"
+      CONNECT_CONFIG_STORAGE_TOPIC: "connect-configs"
+      CONNECT_OFFSET_STORAGE_TOPIC: "connect-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "connect-statuses"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_PLUGIN_PATH: "/usr/share/java"
+    depends_on:
+      - kafka
+    networks:
+      - app_network
+
+  authdb:
+    build: ./authDB
+    container_name: authDB
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: daniel
+      POSTGRES_DB: authDB
+    ports:
+      - "5433:5432"
+    networks:
+      - app_network
+
+  maindb:
+    build: ./mainDB
+    container_name: mainDB
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: daniel
+      POSTGRES_DB: mainDB
+    ports:
+      - "5434:5432"
+    networks:
+      - app_network
+
+  
+  authserver:
+    build: ./authServer
+    container_name: authServer
+    restart: always
+    depends_on:
+      - authdb
+    environment:
+      DATABASE_URL: "postgresql://postgres:daniel@authDB:5432/authDB"
+    ports:
+      - "8001:8000"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

@@ -8,6 +8,7 @@ from db.models import User
 from db.database import SessionDB, engine
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from logs.log import log
 
 app = FastAPI()
 
@@ -54,7 +55,7 @@ def get_user(db: Session, email: str):
 #To create a user in the database
 def create_user(db: Session, user: UserModel):
     hashed_password = pwd_context.hash(user.password)
-    db_user = User(email=user.email, hashed_password=hashed_password)
+    db_user = User(email=user.email, hashed_password=hashed_password, role="user")
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -71,9 +72,12 @@ def register(user: UserModel, db: Session = Depends(get_db)):
 def authenticate_user(db: Session, email: str, password: str):
     user = get_user(db, email)
     if not user:
+        log(f"User not found: {email}")
         return False
     if not pwd_context.verify(password, user.hashed_password):
+        log(f"Password incorrect for user: {email}")
         return False
+    log(f"User authenticated: {email}")
     return user
 
 def create_access_token(data: dict, expires_delta: timedelta):
@@ -84,20 +88,24 @@ def create_access_token(data: dict, expires_delta: timedelta):
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    log(f"Token created: {encoded_jwt}")
     return encoded_jwt
 
 @app.post("/token")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    log(f" Login Credentials: {form_data.username} {form_data.password}")
     user = authenticate_user(db, form_data.username , form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
+    access_token = create_access_token(data={"sub": user.email, "role": user.role}, expires_delta=access_token_expires)
+    log(f"Access Token Deployed: {access_token}")
     return {"access_token": access_token, "token_type": "bearer"}
 
 #Called from get("/verify-token/{token}") to verify valid token
 def verify_token(token: str = Depends(oauth2Scheme)):
     try:
+        log(f"Token received: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:

@@ -10,6 +10,7 @@ const Page = () => {
 
   const router = useRouter();
 
+  //This function validates the form (Email and password)
   const validateForm = () => {
     if(email === "" || password === "") {
       setError("Email and password are required");
@@ -19,6 +20,7 @@ const Page = () => {
     return true;
   }
 
+  //This function handles the form submission (Sending back to auth server and getting the token)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -26,6 +28,7 @@ const Page = () => {
       setLoading(false);
       return;
     }
+    
     
     const formDetails = new URLSearchParams();
     formDetails.append("username", email);
@@ -35,7 +38,7 @@ const Page = () => {
 
     try {
       //Call the authentication service by the IP and Port of service
-      const response = await fetch("http://127.0.0.1:8000/token", {
+      const response = await fetch("http://127.0.0.1:8001/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
@@ -50,10 +53,12 @@ const Page = () => {
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Authentication failed");
+        setLoading(false);
       }
     } catch (error) {
       setLoading(false);
-      setError("An error occurred. Please try again later.");
+      setError("An error occurred while trying to log in. Please try again later.");
+      console.error("Login error:", error);
     }
   }
 

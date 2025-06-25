@@ -1,6 +1,7 @@
 //TODO: Not functional. Switch from SSH to HTTP later on. Test it on another repo and 
 //then come back and fix this. It is not working due to github URL not being encoded properly.
 //We could add the password directly but that is not secure.
+//https://copilot.microsoft.com/shares/DeYrBXj4mzSjT7rfk7Skj
 
 pipeline {
     agent any
