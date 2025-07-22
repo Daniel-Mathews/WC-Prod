@@ -51,14 +51,19 @@ services:
       KEY_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
       CONNECT_PLUGIN_PATH: /kafka/connect/plugins
-    volumes:
-      - ./connectors:/kafka/connectors
-      # - ./kafka-connect/register-connectors.sh:/kafka/register-connectors.sh
-    # command: ["bash", "/kafka/register-connectors.sh"]
     depends_on:
       - kafka
       - authdb
       - maindb
+    networks:
+      - app_network
+
+  connector-registrar:
+    build: ./connector-registrar
+    volumes:
+      - ./connectors:/connectors
+    depends_on:
+      - kafka-connect
     networks:
       - app_network
 
