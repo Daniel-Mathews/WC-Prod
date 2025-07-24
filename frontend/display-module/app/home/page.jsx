@@ -10,14 +10,14 @@ const LandingPage = () => {
   return (
     <>
       <Head>
-        <title>Welcome to Wols Logistics</title>
-        <meta name="description" content="Efficient, Reliable, and Fast Logistics Solutions." />
+        <title>Welcome to WC-Prod</title>
+        <meta name="description" content="WC-Prod" />
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </Head>
       <div className={styles.page}>
         <header className={styles.header}>
-          <div className={styles.logo}>Wols Logistics</div>
+          <div className={styles.logo}>WC-Prod</div>
           {/* Desktop Navigation */}
           <nav className={styles.desktopNav}>
             <a href="/auth/login">Login</a>
