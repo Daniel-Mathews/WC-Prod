@@ -1,0 +1,28 @@
+{
+  "name": "jdbc-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "connection.url": "jdbc:postgresql://maindb:5432/mainDB",
+    "connection.user": "postgres",
+    "connection.password": "daniel",
+
+    "topics.regex": "cdcsourceauth\\.public\\.(.*)",
+
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "insert.mode": "upsert",
+    "pk.mode": "record_key",
+    "pk.fields": "id",
+
+    "transforms": "unwrap,RenameTopic",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.unwrap.drop.tombstones": "true",
+    "transforms.unwrap.delete.handling.mode": "rewrite",
+
+    "transforms.RenameTopic.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.RenameTopic.regex": "cdcsourceauth\\.public\\.(.*)",
+    "transforms.RenameTopic.replacement": "$1",
+
+    "table.name.format": "${topic}"
+  }
+}
