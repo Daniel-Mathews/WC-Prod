@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from db.models import SalesJobs, StatusOptions
 from db.database import SessionDB, engine
-from pydantic import BaseModel
+from pydanticModels import dashboardmodels, salesJobsmodels, priorityJobsmodels, userModels
+from datetime import datetime, timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from logs.log import log
 
@@ -29,25 +31,69 @@ def get_db():
     finally:
         db.close()
 
-class ActiveJobs(BaseModel):
-    name: str
-    status: str
+@app.get("/dashboard", response_model=dashboardmodels.dashboardMetrics)
+def get_dashboard_metrics(db: Session = Depends(get_db)):
+    active_count = db.query(SalesJobs).filter(SalesJobs.status != "Completed").count()
+    completed_count = db.query(SalesJobs).filter(SalesJobs.status == "Completed").count()
+    
+    return {
+        "activeJobCount": {"activeJobCount": active_count},
+        "completedJobCount": {"completedJobCount": completed_count}
+    }
 
-class DashboardMetrics(BaseModel):
-    activeJobs: list[ActiveJobs]
-
-
-
-@app.get("/dashboard/activeJobs", response_model=DashboardMetrics)
+@app.get("/dashboard/salesJobs", response_model=salesJobsmodels.salesJobsMetrics)
 def get_active_Jobs(db: Session = Depends(get_db)):
-    jobs = db.query(SalesJobs).limit(10).all()  # Simulating popular products
+    jobs = db.query(SalesJobs).filter(SalesJobs.status != "Completed")
 
     # Mock transformation: generating dummy price, rating, stockQuantity
     activeJobs = []
     for i, job in enumerate(jobs):
         activeJobs.append({
+            "id": job.id,
             "name": job.name,
             "status": job.status
         })
 
     return {"activeJobs": activeJobs}
+
+@app.get("/dashboard/priority", response_model=priorityJobsmodels.priorityJobsMetrics)
+def get_priority_jobs(db: Session = Depends(get_db)):
+    today = datetime.now()
+    five_days_later = today + timedelta(days=5)
+    deadlines = db.query(SalesJobs).filter(
+        SalesJobs.deadline != None,
+        SalesJobs.deadline >= today,
+        SalesJobs.deadline <= five_days_later,
+        func.lower(SalesJobs.status) != "Completed"
+    ).order_by(SalesJobs.deadline.asc()).all()
+
+    deadlines_list = []
+    for deadline in deadlines:
+        deadlines_list.append({
+            "id": deadline.id,
+            "name": deadline.name,
+            "status": deadline.status,
+            "deadline": deadline.deadline.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    return {
+        "priorityJobs": deadlines_list
+    }
+
+#Only for administrators
+@app.get("/dashboard/users", response_model=userModels.UserMetrics)
+def get_users(db: Session = Depends(get_db)):
+    #Optimize this later
+    users = db.query(users).all()  
+    users_list = []
+    
+    for user in users:
+        users_list.append({
+            "id": user.id,
+            "email": user.email,
+            "role": user.role
+        })
+
+    return {
+        "users": users_list
+    }

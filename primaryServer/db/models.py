@@ -20,6 +20,7 @@ class StatusOptions(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     options = Column(String, unique=True, nullable=False, index=True)
+    #Mandatory inclusions for now: "Completed"
     
 
 #Creating the database table if it does not exist

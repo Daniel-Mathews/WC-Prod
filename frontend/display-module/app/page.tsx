@@ -1,10 +1,8 @@
-import Image from "next/image";
+"use client"
+
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <div>
-      <a href="/auth/register" className="btn btn-primary">Register</a>
-      <a href="/auth/login" className="btn btn-secondary">Login</a>
-    </div>
-  );
+  redirect("/home");
+  return null;
 }
