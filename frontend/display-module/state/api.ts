@@ -1,100 +1,50 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export interface Product {
-  productId: string;
+export interface ActiveJobs {
+  id: number;
   name: string;
-  price: number;
-  rating?: number;
-  stockQuantity: number;
+  status: string;
 }
 
-export interface NewProduct {
+// Define the type for the data sent when creating a new job.
+// This is based on the 'payload' object in your component.
+type NewJobPayload = {
   name: string;
-  price: number;
-  rating?: number;
-  stockQuantity: number;
-}
-
-export interface SalesSummary {
-  salesSummaryId: string;
-  totalValue: number;
-  changePercentage?: number;
-  date: string;
-}
-
-export interface PurchaseSummary {
-  purchaseSummaryId: string;
-  totalPurchased: number;
-  changePercentage?: number;
-  date: string;
-}
-
-export interface ExpenseSummary {
-  expenseSummarId: string;
-  totalExpenses: number;
-  date: string;
-}
-
-export interface ExpenseByCategorySummary {
-  expenseByCategorySummaryId: string;
+  description: string;
+  deadline: string | null;
+  assignee: string;
+  status: string;
   category: string;
-  amount: string;
-  date: string;
-}
+};
 
-export interface DashboardMetrics {
-  popularProducts: Product[];
-  salesSummary: SalesSummary[];
-  purchaseSummary: PurchaseSummary[];
-  expenseSummary: ExpenseSummary[];
-  expenseByCategorySummary: ExpenseByCategorySummary[];
-}
-
-export interface User {
-  userId: string;
-  name: string;
-  email: string;
-}
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+  baseQuery: fetchBaseQuery(),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Products", "Users", "Expenses"],
+  tagTypes: ["ActiveJobs"],
   endpoints: (build) => ({
-    getDashboardMetrics: build.query<DashboardMetrics, void>({
-      query: () => "/dashboard",
-      providesTags: ["DashboardMetrics"],
-    }),
-    getProducts: build.query<Product[], string | void>({
+    getActiveJobs: build.query<ActiveJobs[], string | void>({
       query: (search) => ({
-        url: "/products",
+        url: "https://127.0.0.1:8003/dashboard/salesJobs",
         params: search ? { search } : {},
       }),
-      providesTags: ["Products"],
+      providesTags: ["ActiveJobs"],
     }),
-    createProduct: build.mutation<Product, NewProduct>({
-      query: (newProduct) => ({
-        url: "/products",
-        method: "POST",
-        body: newProduct,
-      }),
-      invalidatesTags: ["Products"],
-    }),
-    getUsers: build.query<User[], void>({
-      query: () => "/users",
-      providesTags: ["Users"],
-    }),
-    getExpensesByCategory: build.query<ExpenseByCategorySummary[], void>({
-      query: () => "/expenses",
-      providesTags: ["Expenses"],
+
+    // Mutation to create a new job
+    createJob: build.mutation<ActiveJobs, Partial<NewJobPayload>>({
+        query: (body) => ({
+            url: 'https://127.0.0.1:8003/dashboard/salesJobs',
+            method: 'POST',
+            body,
+        }),
+        // Invalidates the 'ActiveJobs' tag to trigger a refetch of the job list
+        invalidatesTags: ['ActiveJobs'],
     }),
   }),
 });
 
 export const {
-  useGetDashboardMetricsQuery,
-  useGetProductsQuery,
-  useCreateProductMutation,
-  useGetUsersQuery,
-  useGetExpensesByCategoryQuery,
+  useGetActiveJobsQuery,
+  useCreateJobMutation, // Export the new hook
 } = api;

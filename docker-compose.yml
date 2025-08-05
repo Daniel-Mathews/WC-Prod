@@ -108,6 +108,19 @@ services:
     networks:
       - app_network
 
+  primaryserver:
+    build: ./primaryServer
+    container_name: primaryServer
+    restart: always
+    depends_on:
+      - maindb
+    environment:
+      DATABASE_URL: "postgresql://postgres:daniel@mainDB:5432/mainDB"
+    ports:
+      - "8003:8002"
+    networks:
+      - app_network
+
 networks:
   app_network:
     driver: bridge

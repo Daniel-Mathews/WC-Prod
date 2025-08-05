@@ -5,6 +5,7 @@ from db.models import SalesJobs, StatusOptions
 from db.database import SessionDB, engine
 from pydanticModels import dashboardmodels, salesJobsmodels, priorityJobsmodels, userModels
 from datetime import datetime, timedelta
+from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from logs.log import log
 
@@ -42,12 +43,25 @@ def get_dashboard_metrics(db: Session = Depends(get_db)):
     }
 
 @app.get("/dashboard/salesJobs", response_model=salesJobsmodels.salesJobsMetrics)
-def get_active_Jobs(db: Session = Depends(get_db)):
-    jobs = db.query(SalesJobs).filter(SalesJobs.status != "Completed")
+def get_active_Jobs(db: Session = Depends(get_db), search: Optional[str] = None):
+    """
+    Fetches active sales jobs.
+    If a 'search' query parameter is provided, it filters jobs by name.
+    """
+    # Start with the base query to get non-completed jobs
+    query = db.query(SalesJobs).filter(SalesJobs.status != "Completed")
 
-    # Mock transformation: generating dummy price, rating, stockQuantity
+    # If a search term is provided, add a filter to the query
+    if search:
+        # Use .ilike() for a case-insensitive "contains" search
+        query = query.filter(SalesJobs.name.ilike(f"%{search}%"))
+
+    # Execute the final query
+    jobs = query.all()
+
+    # Transform the data for the response
     activeJobs = []
-    for i, job in enumerate(jobs):
+    for job in jobs:
         activeJobs.append({
             "id": job.id,
             "name": job.name,
