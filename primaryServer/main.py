@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from db.models import SalesJobs, StatusOptions
+from db.models import SalesJobs
 from db.database import SessionDB, engine
-from pydanticModels import dashboardmodels, salesJobsmodels, priorityJobsmodels, userModels
+from pydanticModels import dashboardmodels, salesJobsmodels, priorityJobsmodels, usersmodels
 from datetime import datetime, timedelta
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
@@ -70,6 +70,63 @@ def get_active_Jobs(db: Session = Depends(get_db), search: Optional[str] = None)
 
     return {"activeJobs": activeJobs}
 
+
+@app.post("/dashboard/salesJobs", response_model=salesJobsmodels.ActiveJobs)
+def create_job(job_data: salesJobsmodels.CreateJobPayload, db: Session = Depends(get_db)):
+    """
+    Creates a new sales job and stores it in the database.
+    """
+    # Create a new SQLAlchemy SalesJobs object from the validated request data
+    new_job = SalesJobs(
+        name=job_data.name,
+        description=job_data.description,
+        deadline=job_data.deadline,
+        assignee=job_data.assignee,
+        status=job_data.status,
+        category=job_data.category
+    )
+
+    # Add the new job to the session, commit it to the database,
+    # and refresh to get the new ID.
+    db.add(new_job)
+    db.commit()
+    db.refresh(new_job)
+
+    # Return the newly created job. FastAPI will serialize it using the
+    # 'ActiveJobResponse' model.
+    return new_job
+
+@app.get("/dashboard/salesJobs/{job_id}", response_model=salesJobsmodels.JobDetails)
+def get_job_by_id(job_id: int, db: Session = Depends(get_db)):
+    """
+    Fetches a single job by its ID.
+    """
+    job = db.query(SalesJobs).filter(SalesJobs.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
+
+@app.patch("/dashboard/salesJobs/{job_id}", response_model=salesJobsmodels.JobDetails)
+def update_job(job_id: int, job_update: salesJobsmodels.UpdateJobPayload, db: Session = Depends(get_db)):
+    """
+    Updates a job's details (e.g., description, deadline) using a partial update.
+    """
+    db_job = db.query(SalesJobs).filter(SalesJobs.id == job_id).first()
+    if not db_job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Get the update data, excluding any fields that were not sent
+    update_data = job_update.model_dump(exclude_unset=True)
+
+    # Update the database object with the new data
+    for key, value in update_data.items():
+        setattr(db_job, key, value)
+
+    db.commit()
+    db.refresh(db_job)
+    return db_job
+
+
 @app.get("/dashboard/priority", response_model=priorityJobsmodels.priorityJobsMetrics)
 def get_priority_jobs(db: Session = Depends(get_db)):
     today = datetime.now()
@@ -95,7 +152,7 @@ def get_priority_jobs(db: Session = Depends(get_db)):
     }
 
 #Only for administrators
-@app.get("/dashboard/users", response_model=userModels.UserMetrics)
+@app.get("/dashboard/users", response_model=usersmodels.UserMetrics)
 def get_users(db: Session = Depends(get_db)):
     #Optimize this later
     users = db.query(users).all()  
