@@ -1,11 +1,10 @@
-// app/jobs/[id]/page.tsx
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useGetJobByIdQuery, useUpdateJobMutation } from "../../../../state/api"; // Adjust import path
+import { useGetJobByIdQuery, useUpdateJobMutation, useDeleteJobMutation } from "../../../../state/api"; // Adjust import path and add useDeleteJobMutation
 import { format } from 'date-fns';
-import { ArrowLeft, Info, Tag, User } from "lucide-react";
+import { ArrowLeft, Info, Tag, User, Trash2 } from "lucide-react"; // Add Trash2
 
 // Define the available status options
 const statusOptions = [
@@ -21,6 +20,7 @@ export default function JobDetailsPage() {
 
     const { data: job, isLoading, isError, isSuccess } = useGetJobByIdQuery(jobId);
     const [updateJob, { isLoading: isUpdating }] = useUpdateJobMutation();
+    const [deleteJob, { isLoading: isDeleting }] = useDeleteJobMutation(); // Add deleteJob mutation
 
     // --- Local state for all editable fields ---
     const [description, setDescription] = useState("");
@@ -46,6 +46,19 @@ export default function JobDetailsPage() {
         }
     };
 
+    const handleDeleteJob = async () => {
+        if (window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
+            try {
+                await deleteJob(Number(jobId)).unwrap();
+                alert("Job deleted successfully!");
+                router.push("/dashboard/activeJobs"); // Redirect to the jobs list page
+            } catch (error) {
+                console.error("Failed to delete job:", error);
+                alert("Error: Could not delete the job.");
+            }
+        }
+    };
+
     if (isLoading) return <div className="p-6 text-center">Loading job details...</div>;
     if (isError) return <div className="p-6 text-center text-red-500">Error fetching job details.</div>;
     if (!job) return <div className="p-6 text-center">Job not found.</div>;
@@ -57,18 +70,29 @@ export default function JobDetailsPage() {
     return (
         <div className="p-4 md:p-6 space-y-6">
             {/* --- Page Header --- */}
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={() => router.back()}
-                    className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white-700 transition-colors"
-                    aria-label="Go back"
-                >
-                    <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-white-300" />
-                </button>
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray">{job.name}</h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Job ID: {job.id}</p>
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => router.back()}
+                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-white-700 transition-colors"
+                        aria-label="Go back"
+                    >
+                        <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-white-300" />
+                    </button>
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray">{job.name}</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Job ID: {job.id}</p>
+                    </div>
                 </div>
+
+                <button
+                    onClick={handleDeleteJob}
+                    disabled={isDeleting}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed transition-colors"
+                >
+                    <Trash2 className="w-5 h-5" />
+                    {isDeleting ? "Deleting..." : "Delete Job"}
+                </button>
             </div>
 
             {/* --- Main Content Layout --- */}

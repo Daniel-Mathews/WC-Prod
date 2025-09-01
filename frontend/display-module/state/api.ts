@@ -44,15 +44,26 @@ export const api = createApi({
         return response.activeJobs;
       },
     }),
+    getPriorityJobs: build.query<ActiveJobs[], string | void>({
+      query: (search) => ({
+        url: "http://127.0.0.1:8003/dashboard/priority",
+        params: search ? { search } : {},
+      }),
+      providesTags: ["ActiveJobs"],
 
-    // ✅ NEW: Endpoint to get a single job by its ID
+      transformResponse: (response: { priorityJobs: ActiveJobs[] }) => {
+        return response.priorityJobs;
+      },
+    }),
+
+    //Endpoint to get a single job by its ID
     getJobById: build.query<JobDetails, string>({
       query: (id) => `http://127.0.0.1:8003/dashboard/salesJobs/${id}`,
       // Provides a specific tag for this job, e.g., { type: 'Job', id: '123' }
       providesTags: (result, error, id) => [{ type: "Job", id }],
     }),
 
-    // ✅ NEW: Endpoint to update a job
+    //Endpoint to update a job
     updateJob: build.mutation<JobDetails, Partial<JobDetails> & Pick<JobDetails, 'id'>>({
       query: ({ id, ...patch }) => ({
         url: `http://127.0.0.1:8003/dashboard/salesJobs/${id}`,
@@ -60,7 +71,7 @@ export const api = createApi({
         body: patch,
       }),
       // Invalidates the specific job tag, forcing a refetch of getJobById
-      invalidatesTags: (result, error, { id }) => [{ type: "Job", id }],
+      invalidatesTags: (result, error, { id }) => [{ type: "Job", id }, 'ActiveJobs'],
     }),
 
     // Mutation to create a new job
@@ -73,6 +84,16 @@ export const api = createApi({
         // Invalidates the 'ActiveJobs' tag to trigger a refetch of the job list
         invalidatesTags: ['ActiveJobs'],
     }),
+    
+    // Mutation to delete a job by its ID
+    deleteJob: build.mutation<void, number>({
+        query: (id) => ({
+            url: `http://127.0.0.1:8003/dashboard/salesJobs/${id}`,
+            method: 'DELETE',
+        }),
+        // Invalidates both the specific job and the full list to trigger a refetch
+        invalidatesTags: (result, error, id) => [{ type: "Job", id }, "ActiveJobs"],
+    }),
   }),
 });
 
@@ -81,4 +102,6 @@ export const {
   useCreateJobMutation, 
   useGetJobByIdQuery,
   useUpdateJobMutation,
+  useDeleteJobMutation,
+  useGetPriorityJobsQuery
 } = api;

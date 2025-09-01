@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from db.models import SalesJobs
@@ -144,7 +144,7 @@ def get_priority_jobs(db: Session = Depends(get_db)):
             "id": deadline.id,
             "name": deadline.name,
             "status": deadline.status,
-            "deadline": deadline.deadline.strftime("%Y-%m-%d %H:%M:%S")
+            #"deadline": deadline.deadline.strftime("%Y-%m-%d %H:%M:%S")
         })
 
     return {
@@ -168,3 +168,16 @@ def get_users(db: Session = Depends(get_db)):
     return {
         "users": users_list
     }
+
+#Deletes a single job by ID
+@app.delete("/dashboard/salesJobs/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_job(job_id: int, db: Session = Depends(get_db)):
+    
+    db_job = db.query(SalesJobs).filter(SalesJobs.id == job_id).first()
+    if not db_job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    db.delete(db_job)
+    db.commit()
+    
+    return {"message": "Job deleted successfully"}
