@@ -3,6 +3,8 @@
 import React, { useEffect } from "react";
 import Navbar from "./{components}/Navbar";
 import Sidebar from "./{components}/Sidebar";
+import useAuth from "./{components}/useAuth";
+import Loading from "./{components}/loading";
 import StoreProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +41,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = useAuth(); // Get the authentication state
+
+  if (!isAuthenticated) {
+    return <Loading />; // Show a loading indicator while authenticating
+  }
+
+  // If authenticated, render the dashboard layout with its children
   return (
     <StoreProvider>
       <DashboardLayout>{children}</DashboardLayout>
