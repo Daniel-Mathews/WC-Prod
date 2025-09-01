@@ -93,7 +93,7 @@ const Sidebar = () => {
             isSidebarCollapsed ? "hidden" : "block"
           } font-extrabold text-2xl`}
         >
-          WOLS 
+          Daniel 
         </h1>
 
         <button
@@ -146,7 +146,7 @@ const Sidebar = () => {
 
       {/* FOOTER */}
       <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10`}>
-        <p className="text-center text-xs text-gray-500">&copy; 2025 Wols Logistics</p>
+        <p className="text-center text-xs text-gray-500">&copy; 2025 Daniel Mathews</p>
       </div>
     </div>
   );

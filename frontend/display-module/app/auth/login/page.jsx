@@ -51,7 +51,7 @@ const Page = () => {
       if(response.status === 200) {
         const data = await response.json();
         localStorage.setItem("token", data.access_token);
-        router.push("/dashboard");
+        router.push("/dashboard/activeJobs");
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Authentication failed");
@@ -67,7 +67,7 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Login - Wols Logistics</title>
+        <title>Login - Daniel Mathews</title>
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>

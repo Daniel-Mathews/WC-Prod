@@ -62,13 +62,13 @@ const Page = () => {
   return (
     <>
       <Head>
-        <title>Register - Wols Logistics</title>
+        <title>Register - Daniel Mathews</title>
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>
       <div className={styles.page}>
         <div className={styles.authCard}>
-          <h1 className={styles.title}>Dashboard Registration!</h1>
+          <h1 className={styles.title}>Registration!</h1>
           <p className={styles.subtitle}>Register to access your dashboard.</p>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
