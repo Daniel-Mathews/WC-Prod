@@ -9,3 +9,4 @@ passlib
 psycopg2
 datetime
 pydantic
+typing
