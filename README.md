@@ -1,4 +1,4 @@
-# Sales Dashboard for Wols Logistics
+# WC PROD
 Production server of the WC-Care Project
 
 Using node 22.13.1
