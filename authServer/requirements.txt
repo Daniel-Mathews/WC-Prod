@@ -9,3 +9,5 @@ passlib
 psycopg2
 datetime
 pydantic
+typing
+argon2-cffi

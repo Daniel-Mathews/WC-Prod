@@ -1,0 +1,7 @@
+typing
+fastapi
+sqlalchemy
+datetime
+pydantic
+uvicorn
+psycopg2

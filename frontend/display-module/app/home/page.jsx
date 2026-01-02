@@ -10,14 +10,14 @@ const LandingPage = () => {
   return (
     <>
       <Head>
-        <title>Welcome to WC-Prod</title>
-        <meta name="description" content="WC-Prod" />
+        <title>Welcome to Daniel Mathews' Project</title>
+        <meta name="description" content="Scalable and Distributed" />
         <link rel="icon" href="/favicon.ico" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </Head>
       <div className={styles.page}>
         <header className={styles.header}>
-          <div className={styles.logo}>WC-Prod</div>
+          <div className={styles.logo}>Daniel Mathews</div>
           {/* Desktop Navigation */}
           <nav className={styles.desktopNav}>
             <a href="/auth/login">Login</a>
@@ -45,13 +45,13 @@ const LandingPage = () => {
 
         <main className={styles.main}>
           <div className={styles.hero}>
-            <h1 className={styles.heroTitle}>WC-Prod</h1>
-            <p className={styles.heroSubtitle}>WC-Prod</p>
+            <h1 className={styles.heroTitle}>Streamline Your Software Solutions with Daniel Mathews</h1>
+            <p className={styles.heroSubtitle}>A dedicated and harding working student.</p>
             
           </div>
         </main>
         <footer className={styles.footer}>
-          <p>&copy; 2025 WC-Prod. All Rights Reserved.</p>
+          <p>&copy; 2025 Daniel Mathews. All Rights Reserved.</p>
         </footer>
       </div>
     </>

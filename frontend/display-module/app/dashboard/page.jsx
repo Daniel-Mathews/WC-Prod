@@ -2,7 +2,7 @@
 
 import useAuth from "./{components}/useAuth";
 import Loading from "./{components}/loading";
-
+/*
 const Page = () => {
     const isAuthenticated = useAuth(); // Get the authentication state from the hook
     //Authenticate the page
@@ -20,5 +20,13 @@ const Page = () => {
         );
     }
 }
+*/
 
+const Page = () => {
+        return (
+            <div>
+                <h1>Content</h1>
+            </div>
+        );
+}
 export default Page;

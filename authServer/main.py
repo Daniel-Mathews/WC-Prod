@@ -9,6 +9,7 @@ from db.database import SessionDB, engine
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from logs.log import log
+from typing import Optional
 
 app = FastAPI()
 
@@ -36,7 +37,7 @@ def get_db():
         db.close()
 
 # Hashing (Setting the hash)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Secret key
 SECRET_KEY = "d4b7b3f3b1d3e8d7d9f4b7"
@@ -118,3 +119,26 @@ def verify_token(token: str = Depends(oauth2Scheme)):
 async def verify_user_token(token: str):
     verify_token(token)
     return {"message": "Token is valid"}
+
+# The below function is in development for role based access control
+# This function extracts the role from the token's payload
+def verify_token_role(token: str = Depends(oauth2Scheme)):
+    try:
+        log(f"Token received: {token}")
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        role: Optional[str] = payload.get("role")
+        if role:
+            return role
+        # If the token is valid but has no role, it's still an invalid use case for role-based access
+        raise HTTPException(status_code=403, detail="No role found in token")
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Invalid token or expired")
+
+# New endpoint to verify the user's role from the token
+@app.get("/verify-role/{token}")
+async def verify_user_role(token: str):
+    """
+    Verifies the provided token and returns the user's role.
+    """
+    role = verify_token_role(token=token)
+    return {"role": role, "message": "Role is valid"}

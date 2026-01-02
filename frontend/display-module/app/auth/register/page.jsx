@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Head from 'next/head';
+import styles from '../../auth/AuthPage.module.css';
 
 const Page = () => {
   const router = useRouter();
@@ -44,7 +46,7 @@ const Page = () => {
       if (response.ok) {
         setSuccess("Registration successful. Redirecting to login...");
         setTimeout(() => {
-          router.push("/login");
+          router.push("/auth/login");
         }, 2000);
       } else {
         setError(result.detail || "Registration failed");
@@ -58,36 +60,51 @@ const Page = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email: </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <>
+      <Head>
+        <title>Register - Daniel Mathews</title>
+        <link rel="icon" href="/favicon.ico" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </Head>
+      <div className={styles.page}>
+        <div className={styles.authCard}>
+          <h1 className={styles.title}>Registration!</h1>
+          <p className={styles.subtitle}>Register to access your dashboard.</p>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="email" className={styles.label}>Email Address</label>
+              <input
+                type="email"
+                id="email"
+                className={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.label}>Password</label>
+              <input
+                type="password"
+                id="password"
+                className={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            {/* Display error message if it exists */}
+            {error && <p className={styles.errorText}>{error}</p>}
+            <button type="submit" className={styles.button} disabled={loading}>
+              {loading ? 'Registering...' : 'Register'}
+            </button>
+          </form>
+          <p className={styles.footerText}>
+            Already have an account? <a href="/auth/login" className={styles.link}>Login</a>
+          </p>
         </div>
-        <div>
-          <label>Password: </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <button type="submit" disabled={loading}>
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {success && <p style={{ color: "green" }}>{success}</p>}
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 

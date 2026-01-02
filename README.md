@@ -1,4 +1,4 @@
-# WC-Prod
+# Sales Dashboard for Wols Logistics
 Production server of the WC-Care Project
 
 Using node 22.13.1
@@ -27,3 +27,4 @@ Installing devDependencies:
 - eslint
 - eslint-config-next
 - @eslint/eslintrc
+
