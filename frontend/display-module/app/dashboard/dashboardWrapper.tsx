@@ -41,11 +41,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useAuth(); // Get the authentication state
+  //const isAuthenticated = useAuth(); // Get the authentication state
 
-  if (!isAuthenticated) {
-    return <Loading />; // Show a loading indicator while authenticating
-  }
+  //if (!isAuthenticated) {
+    //return <Loading />; // Show a loading indicator while authenticating
+  //}
 
   // If authenticated, render the dashboard layout with its children
   return (

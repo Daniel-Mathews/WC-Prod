@@ -22,6 +22,14 @@ class StatusOptions(Base):
     options = Column(String, unique=True, nullable=False, index=True)
     #Mandatory inclusions for now: "Completed"
     
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="user")
+
 
 #Creating the database table if it does not exist
 SalesJobs.metadata.create_all(bind=engine)

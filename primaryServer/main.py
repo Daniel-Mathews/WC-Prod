@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from db.models import SalesJobs
+from db.models import SalesJobs, User
 from db.database import SessionDB, engine
 from pydanticModels import dashboardmodels, salesJobsmodels, priorityJobsmodels, usersmodels
 from datetime import datetime, timedelta
@@ -155,7 +155,7 @@ def get_priority_jobs(db: Session = Depends(get_db)):
 @app.get("/dashboard/users", response_model=usersmodels.UserMetrics)
 def get_users(db: Session = Depends(get_db)):
     #Optimize this later
-    users = db.query(users).all()  
+    users = db.query(User).all()  
     users_list = []
     
     for user in users:

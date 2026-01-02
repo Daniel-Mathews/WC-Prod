@@ -37,7 +37,7 @@ def get_db():
         db.close()
 
 # Hashing (Setting the hash)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 # Secret key
 SECRET_KEY = "d4b7b3f3b1d3e8d7d9f4b7"
